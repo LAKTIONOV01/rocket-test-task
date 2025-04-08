@@ -1,0 +1,92 @@
+[
+  {
+    "model": "main.networknode",
+    "pk": 1,
+    "fields": {
+      "name": "Электронный завод 'Микрочип'",
+      "node_type": "factory",
+      "email": "factory@microchip.ru",
+      "country": "Россия",
+      "city": "Москва",
+      "street": "Промышленная",
+      "house_number": "10",
+      "supplier": null,
+      "debt": "0.00",
+      "created_at": "2023-01-01T00:00:00Z",
+      "level": 0
+    }
+  },
+  {
+    "model": "main.networknode",
+    "pk": 2,
+    "fields": {
+      "name": "Центральный дистрибьютор",
+      "node_type": "distributor",
+      "email": "distributor@electronics.ru",
+      "country": "Россия",
+      "city": "Санкт-Петербург",
+      "street": "Торговая",
+      "house_number": "5",
+      "supplier": 1,
+      "debt": "15000.00",
+      "created_at": "2023-01-02T00:00:00Z",
+      "level": 1
+    }
+  },
+  {
+    "model": "main.networknode",
+    "pk": 3,
+    "fields": {
+      "name": "Дилерский центр 'ТехноМир'",
+      "node_type": "dealership",
+      "email": "technomir@dealer.ru",
+      "country": "Россия",
+      "city": "Казань",
+      "street": "Центральная",
+      "house_number": "15",
+      "supplier": 2,
+      "debt": "7500.50",
+      "created_at": "2023-01-03T00:00:00Z",
+      "level": 2
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": 1,
+    "fields": {
+      "name": "Смартфон",
+      "model": "Galaxy S23",
+      "release_date": "2023-02-01",
+      "network_node": 1
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": 2,
+    "fields": {
+      "name": "Ноутбук",
+      "model": "UltraBook Pro",
+      "release_date": "2023-03-15",
+      "network_node": 1
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": 3,
+    "fields": {
+      "name": "Телевизор",
+      "model": "SmartTV 4K",
+      "release_date": "2023-01-10",
+      "network_node": 2
+    }
+  },
+  {
+    "model": "main.employee",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "network_node": 1,
+      "is_active": true
+    }
+  }
+]
