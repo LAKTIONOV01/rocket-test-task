@@ -1,5 +1,3 @@
-celery_app.py
 db.sqlite3
-docker-compose.yml
 main/utils.py
-main/tasks.py
+celerybeat-schedule
