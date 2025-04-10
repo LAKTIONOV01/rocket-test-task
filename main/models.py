@@ -27,10 +27,6 @@ class NetworkNode(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Время создания')
     level = models.IntegerField(default=0, verbose_name='Уровень иерархии')
 
-    class Meta:
-        verbose_name = 'Сеть'
-        verbose_name_plural = 'Сети'
-
     def save(self, *args, **kwargs):
         if self.supplier:
             self.level = self.supplier.level + 1
@@ -69,3 +65,4 @@ class Employee(models.Model):
 
     def __str__(self):
         return self.user.get_full_name() or self.user.username
+

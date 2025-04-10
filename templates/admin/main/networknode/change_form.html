@@ -1,0 +1,16 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block extrahead %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Ваш JS-код для кнопки копирования
+    const email = "{{ original.email }}";
+    const btn = document.createElement('button');
+    btn.textContent = 'Копировать email';
+    btn.onclick = () => navigator.clipboard.writeText(email);
+    document.querySelector('.field-email').append(btn);
+});
+</script>
+{% endblock %}

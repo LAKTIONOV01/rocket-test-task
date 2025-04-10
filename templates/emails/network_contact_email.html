@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Контактные данные</title>
+</head>
+<body>
+    <h2>Контактные данные: {{ node.name }}</h2>
+    <p><strong>Тип:</strong> {{ node.node_type }}</p>
+    <p><strong>Email:</strong> {{ node.email }}</p>
+    <p><strong>Адрес:</strong> {{ node.country }}, {{ node.city }}, {{ node.street }}, {{ node.house_number }}</p>
+    {% if node.phone %}
+    <p><strong>Телефон:</strong> {{ node.phone }}</p>
+    {% endif %}
+
+    <h3>QR-код с контактными данными:</h3>
+    <img src="cid:qr_code" alt="QR Code" style="width:200px; height:200px;">
+
+    <p>Вы можете отсканировать этот QR-код для быстрого сохранения контактов.</p>
+</body>
+</html>

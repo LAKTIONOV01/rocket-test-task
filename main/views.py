@@ -1,10 +1,11 @@
 from rest_framework import viewsets, generics, permissions, filters
-from rest_framework.response import Response
 from django.db.models import Avg
 from .models import NetworkNode, Product, Employee
 from .serializers import NetworkNodeSerializer, ProductSerializer, EmployeeSerializer
-from django.contrib.auth.models import User
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from .tasks import send_network_contact_email
 
 
 class IsActiveEmployee(permissions.BasePermission):
@@ -24,6 +25,7 @@ class NetworkNodeViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+
         product_id = self.request.query_params.get('product')
         if product_id:
             queryset = queryset.filter(products__id=product_id)
@@ -34,6 +36,43 @@ class NetworkNodeViewSet(viewsets.ModelViewSet):
         if instance.supplier:
             instance.level = instance.supplier.level + 1
             instance.save()
+
+    @action(detail=True, methods=['post'])
+    def send_contacts(self, request, pk=None):
+        """Отправляет контактные данные с QR-кодом на email"""
+        node = self.get_object()
+        recipient_email = request.data.get('email', request.user.email)
+
+        # Асинхронная отправка через Celery
+        send_network_contact_email.delay(node.id, recipient_email)
+
+        return Response({
+            "status": "success",
+            "message": f"Письмо с QR-кодом будет отправлено на {recipient_email}",
+            "node_id": node.id
+        })
+
+    # @action(detail=True, methods=['post'])
+    # def send_contacts(self, request, pk=None):
+    #     """
+    #     Отправляет контактные данные объекта на email пользователя
+    #     POST /api/network-nodes/1/send_contacts/
+    #     {
+    #         "email": "optional@example.com"  # Опционально
+    #     }
+    #     """
+    #     node = self.get_object()
+    #     recipient_email = request.data.get('email', request.user.email)
+    #
+    #     send_network_contact_email.delay(node.id, recipient_email)
+    #
+    #     return Response({
+    #         "status": "success",
+    #         "message": f"Контактные данные будут отправлены на {recipient_email}",
+    #         "node_id": node.id
+    #     })
+
+
 
 
 class ProductViewSet(viewsets.ModelViewSet):

@@ -38,3 +38,9 @@ class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = '__all__'
+
+
+class NetworkNodeContactSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NetworkNode
+        fields = ['id', 'name', 'email', 'country', 'city', 'street', 'house_number']

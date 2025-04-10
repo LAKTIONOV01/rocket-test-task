@@ -24,15 +24,6 @@ def increase_debt_randomly():
             node.save()
             updated_count += 1
 
-    # # Отправка уведомления (опционально)
-    # send_mail(
-    #     'Увеличение задолженности',
-    #     f'Задолженность увеличена на {increment} для {updated_count} объектов',
-    #     settings.DEFAULT_FROM_EMAIL,
-    #     ['finance@example.com'],
-    #     fail_silently=True,
-    # )
-
     return f"Increased debt by {increment} for {updated_count} nodes"
 
 
@@ -70,3 +61,120 @@ def async_clear_debt(node_ids):
 
 
     return f"Cleared debt for {cleared_count} nodes"
+
+
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+
+from celery import shared_task
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+import qrcode
+from io import BytesIO
+import base64
+from .models import NetworkNode
+from .serializers import NetworkNodeContactSerializer
+
+
+@shared_task
+def generate_qr_code(node_data):
+    """Генерация QR-кода с контактными данными"""
+    contact_info = f"""
+    Название: {node_data['name']}
+    Тип: {node_data['node_type']}
+    Email: {node_data['email']}
+    Адрес: {node_data['country']}, {node_data['city']}, {node_data['street']}, {node_data['house_number']}
+    Телефон: {node_data.get('phone', 'не указан')}
+    """
+
+    qr = qrcode.QRCode(version=1, box_size=10, border=5)
+    qr.add_data(contact_info)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill_color="black", back_color="white")
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    return base64.b64encode(buffer.getvalue()).decode()
+
+
+@shared_task
+def send_network_contact_email(node_id, recipient_email):
+    """Отправка email с контактными данными и QR-кодом"""
+    node = NetworkNode.objects.get(id=node_id)
+    serializer = NetworkNodeContactSerializer(node)
+    node_data = serializer.data
+    node_data['node_type'] = node.get_node_type_display()  # Добавляем отображаемое имя типа
+
+    # Генерация QR-кода
+    qr_code_data = generate_qr_code(node_data)
+
+    subject = f"Контактные данные: {node_data['name']}"
+
+    # Подготовка HTML и текстового содержимого
+    context = {
+        'node': node_data,
+        'qr_code': qr_code_data
+    }
+
+    html_content = render_to_string('emails/network_contact_email.html', context)
+
+    text_content = f"""
+    Контактные данные: {node_data['name']}
+    Тип: {node_data['node_type']}
+    Email: {node_data['email']}
+    Адрес: {node_data['country']}, {node_data['city']}, {node_data['street']}, {node_data['house_number']}
+    Телефон: {node_data.get('phone', 'не указан')}
+    """
+
+    # Создание и отправка письма
+    email = EmailMultiAlternatives(
+        subject,
+        text_content,
+        'fxckaccerman@gmail.com',  # Используйте DEFAULT_FROM_EMAIL
+        [recipient_email]
+    )
+    email.attach_alternative(html_content, "text/html")
+
+    # Прикрепляем QR-код как вложение
+    email.attach(
+        f"qr_contacts_{node_id}.png",
+        base64.b64decode(qr_code_data),
+        "image/png"
+    )
+
+    email.send()
+    return f"Письмо с QR-кодом отправлено на {recipient_email}"
+
+# @shared_task
+# def send_network_contact_email(node_id, recipient_email):
+#     from .models import NetworkNode
+#     from .serializers import NetworkNodeContactSerializer
+#
+#     node = NetworkNode.objects.get(id=node_id)
+#     serializer = NetworkNodeContactSerializer(node)
+#     node_data = serializer.data
+#
+#     subject = f"Контактные данные: {node_data['name']}"
+#
+#     # Рендер HTML и текстовой версии
+#     html_content = render_to_string('emails/network_contact_email.html', {
+#         'node': node_data
+#     })
+#     text_content = f"""Контактные данные {node_data['name']}
+# Тип: {node.get_node_type_display()}
+# Email: {node_data['email']}
+# Адрес: {node_data['country']}, {node_data['city']}, {node_data['street']}, {node_data['house_number']}
+# """
+#     if node_data.get('phone'):
+#         text_content += f"Телефон: {node_data['phone']}\n"
+#
+#     email = EmailMultiAlternatives(
+#         subject,
+#         text_content,
+#         'fxckaccerman@gmail.com',  # Используется DEFAULT_FROM_EMAIL
+#         [recipient_email]
+#     )
+#     email.attach_alternative(html_content, "text/html")
+#     email.send()
+#
+#     return f"Письмо отправлено на {recipient_email}"
