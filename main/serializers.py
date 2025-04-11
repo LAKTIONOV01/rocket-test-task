@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import NetworkNode, Product, Employee
 
 from django.contrib.auth.models import User
-import datetime
+from datetime import datetime
 
 
 class ProductSerializer(serializers.ModelSerializer):

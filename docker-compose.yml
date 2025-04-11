@@ -3,16 +3,48 @@ version: '3.9'
 services:
   redis:
     image: redis:alpine
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    environment:
+      POSTGRES_DB: rocket_db
+      POSTGRES_USER: rocket_user
+      POSTGRES_PASSWORD: rocket_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5434:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U rocket_user -d rocket_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   django:
     container_name: django
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: sh -c "/app/scripts/wait_for_postgres.sh && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: rocket_db
+      POSTGRES_USER: rocket_user
+      POSTGRES_PASSWORD: rocket_pass
     ports:
       - 8000:8000
     volumes:
       - .:/app
     depends_on:
       - redis
+      - postgres
   celery:
     container_name: celery
     build: .
@@ -40,3 +72,5 @@ services:
       - .:/app
     depends_on:
       - celery
+volumes:
+  postgres_data:

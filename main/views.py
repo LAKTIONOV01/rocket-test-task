@@ -7,6 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from .tasks import send_network_contact_email
 from rest_framework.exceptions import ValidationError
+from .permissions import IsAdminOrActiveEmployee
 
 
 class IsActiveEmployee(permissions.BasePermission):
@@ -19,7 +20,7 @@ class IsActiveEmployee(permissions.BasePermission):
 class NetworkNodeViewSet(viewsets.ModelViewSet):
     queryset = NetworkNode.objects.all()
     serializer_class = NetworkNodeSerializer
-    permission_classes = [IsActiveEmployee]
+    permission_classes = [IsAdminOrActiveEmployee]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['country']
     search_fields = ['name', 'city']
@@ -66,12 +67,12 @@ class NetworkNodeViewSet(viewsets.ModelViewSet):
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [IsActiveEmployee]
+    permission_classes = [IsAdminOrActiveEmployee]
 
 
 class DebtStatisticsView(generics.ListAPIView):
     serializer_class = NetworkNodeSerializer
-    permission_classes = [IsActiveEmployee]
+    permission_classes = [IsAdminOrActiveEmployee]
 
     def get_queryset(self):
         avg_debt = NetworkNode.objects.aggregate(avg_debt=Avg('debt'))['avg_debt']
