@@ -22,8 +22,33 @@ class ProductSerializer(serializers.ModelSerializer):
         return value
 
 
+class ProductShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'name']
+
+
+class NetworkNodeForProductFilterSerializer(serializers.ModelSerializer):
+    supplier_name = serializers.CharField(source='supplier.name', read_only=True)
+
+    class Meta:
+        model = NetworkNode
+        fields = [
+            'id',
+            'name',
+            'node_type',
+            'supplier_name',
+            'country',
+            'city',
+            'debt',
+            'level',
+            'created_at'
+        ]
+        read_only_fields = fields
+
+
 class NetworkNodeSerializer(serializers.ModelSerializer):
-    products = ProductSerializer(many=True, read_only=True)
+    products = ProductShortSerializer(many=True, read_only=True)
     supplier = serializers.SlugRelatedField(slug_field='name', queryset=NetworkNode.objects.all(), required=False)
 
     class Meta:
@@ -37,6 +62,7 @@ class NetworkNodeSerializer(serializers.ModelSerializer):
         return value
 
         # Дополнительная валидация для всех данных
+
     def validate(self, data):
         if 'debt' in data and self.instance and data['debt'] != self.instance.debt:
             raise serializers.ValidationError({"debt": "Нельзя изменять задолженность через API"})

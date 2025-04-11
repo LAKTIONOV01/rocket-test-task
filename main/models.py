@@ -3,7 +3,8 @@ from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from django.utils import timezone
 from django.core.exceptions import ValidationError
-import datetime
+from datetime import datetime
+
 
 class NetworkNode(models.Model):
     NODE_TYPES = (
@@ -27,6 +28,12 @@ class NetworkNode(models.Model):
                                validators=[MinValueValidator(0)], verbose_name='Задолженность')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Время создания')
     level = models.IntegerField(default=0, verbose_name='Уровень иерархии')
+    products = models.ManyToManyField(
+        'Product',
+        related_name='network_nodes',
+        blank=True,
+        verbose_name='Продукты'
+    )
 
     def clean(self):
         if len(self.name) > 50:
@@ -47,8 +54,9 @@ class Product(models.Model):
     name = models.CharField(max_length=255, verbose_name='Название')
     model = models.CharField(max_length=255, verbose_name='Модель')
     release_date = models.DateField(verbose_name='Дата выхода на рынок')
-    network_node = models.ForeignKey(NetworkNode, on_delete=models.CASCADE,
-                                     related_name='products', verbose_name='Звено сети')
+    primary_network_node = models.ForeignKey(NetworkNode, on_delete=models.SET_NULL, null=True,
+                                             blank=True,
+                                             related_name='primary_products', verbose_name='Звено сети')
 
     def clean(self):
         if len(self.name) > 25:
@@ -76,4 +84,3 @@ class Employee(models.Model):
 
     def __str__(self):
         return self.user.get_full_name() or self.user.username
-

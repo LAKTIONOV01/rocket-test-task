@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from .tasks import send_network_contact_email
 from rest_framework.exceptions import ValidationError
 from .permissions import IsAdminOrActiveEmployee
+from rest_framework import status
 
 
 class IsActiveEmployee(permissions.BasePermission):
@@ -17,13 +18,30 @@ class IsActiveEmployee(permissions.BasePermission):
         return False
 
 
+from .filters import NetworkNodeFilter
+from .serializers import NetworkNodeForProductFilterSerializer
+
+
 class NetworkNodeViewSet(viewsets.ModelViewSet):
-    queryset = NetworkNode.objects.all()
+    queryset = NetworkNode.objects.all().prefetch_related('products')
     serializer_class = NetworkNodeSerializer
     permission_classes = [IsAdminOrActiveEmployee]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['country']
+    filterset_fields = ['country', 'products']
     search_fields = ['name', 'city']
+
+    filterset_class = NetworkNodeFilter
+
+    def get_serializer_class(self):
+        if 'product' in self.request.query_params:
+            return NetworkNodeForProductFilterSerializer
+        return super().get_serializer_class()
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if 'product' in self.request.query_params:
+            queryset = queryset.prefetch_related('products', 'supplier')
+        return queryset
 
     def update(self, request, *args, **kwargs):
         # Явная проверка на попытку изменить debt
@@ -33,10 +51,9 @@ class NetworkNodeViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-
         product_id = self.request.query_params.get('product')
         if product_id:
-            queryset = queryset.filter(products__id=product_id)
+            return queryset.filter(products__id=product_id).distinct()
         return queryset
 
     def perform_create(self, serializer):
@@ -44,6 +61,14 @@ class NetworkNodeViewSet(viewsets.ModelViewSet):
         if instance.supplier:
             instance.level = instance.supplier.level + 1
             instance.save()
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(
+            {"message": "Удаление выполнено успешно"},
+            status=status.HTTP_200_OK
+        )
 
     @action(detail=True, methods=['post'])
     def send_contacts(self, request, pk=None):
@@ -61,13 +86,18 @@ class NetworkNodeViewSet(viewsets.ModelViewSet):
         })
 
 
-
-
-
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [IsAdminOrActiveEmployee]
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(
+            {"message": "Удаление выполнено успешно"},
+            status=status.HTTP_200_OK
+        )
 
 
 class DebtStatisticsView(generics.ListAPIView):

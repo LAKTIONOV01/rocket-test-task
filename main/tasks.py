@@ -43,7 +43,6 @@ def decrease_debt_randomly():
             node.save()
             updated_count += 1
 
-
     return f"Decreased debt by {decrement} for {updated_count} nodes"
 
 
@@ -132,4 +131,3 @@ def send_network_contact_email(node_id, recipient_email):
 
     email.send()
     return f"Письмо с QR-кодом отправлено на {recipient_email}"
-
