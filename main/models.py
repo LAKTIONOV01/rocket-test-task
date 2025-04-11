@@ -2,7 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from django.utils import timezone
-
+from django.core.exceptions import ValidationError
+import datetime
 
 class NetworkNode(models.Model):
     NODE_TYPES = (
@@ -27,6 +28,10 @@ class NetworkNode(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Время создания')
     level = models.IntegerField(default=0, verbose_name='Уровень иерархии')
 
+    def clean(self):
+        if len(self.name) > 50:
+            raise ValidationError({'name': 'Название не может быть длиннее 50 символов'})
+
     def save(self, *args, **kwargs):
         if self.supplier:
             self.level = self.supplier.level + 1
@@ -44,6 +49,12 @@ class Product(models.Model):
     release_date = models.DateField(verbose_name='Дата выхода на рынок')
     network_node = models.ForeignKey(NetworkNode, on_delete=models.CASCADE,
                                      related_name='products', verbose_name='Звено сети')
+
+    def clean(self):
+        if len(self.name) > 25:
+            raise ValidationError({'name': 'Название продукта не может быть длиннее 25 символов'})
+        if self.release_date > datetime.now().date():
+            raise ValidationError({'release_date': 'Дата выхода не может быть в будущем'})
 
     class Meta:
         verbose_name = 'Продукт'

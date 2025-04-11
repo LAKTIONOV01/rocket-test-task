@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import NetworkNode, Product, Employee
 
 from django.contrib.auth.models import User
+import datetime
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -9,6 +10,16 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = '__all__'
         read_only_fields = ('id',)
+
+    def validate_name(self, value):
+        if len(value) > 25:
+            raise serializers.ValidationError("Название продукта не может быть длиннее 25 символов")
+        return value
+
+    def validate_release_date(self, value):
+        if value > datetime.now().date():
+            raise serializers.ValidationError("Дата выхода продукта не может быть в будущем")
+        return value
 
 
 class NetworkNodeSerializer(serializers.ModelSerializer):
@@ -18,12 +29,18 @@ class NetworkNodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = NetworkNode
         fields = '__all__'
-        read_only_fields = ('created_at', 'level')
+        read_only_fields = ('created_at', 'level', 'debt')
 
-    def validate_debt(self, value):
-        if self.instance and 'debt' in self.initial_data:
-            raise serializers.ValidationError("Обновление задолженности через API запрещено")
+    def validate_name(self, value):
+        if len(value) > 50:
+            raise serializers.ValidationError("Название объекта сети не может быть длиннее 50 символов")
         return value
+
+        # Дополнительная валидация для всех данных
+    def validate(self, data):
+        if 'debt' in data and self.instance and data['debt'] != self.instance.debt:
+            raise serializers.ValidationError({"debt": "Нельзя изменять задолженность через API"})
+        return data
 
 
 class UserSerializer(serializers.ModelSerializer):

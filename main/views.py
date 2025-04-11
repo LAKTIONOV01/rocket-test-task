@@ -6,6 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .tasks import send_network_contact_email
+from rest_framework.exceptions import ValidationError
 
 
 class IsActiveEmployee(permissions.BasePermission):
@@ -22,6 +23,12 @@ class NetworkNodeViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['country']
     search_fields = ['name', 'city']
+
+    def update(self, request, *args, **kwargs):
+        # Явная проверка на попытку изменить debt
+        if 'debt' in request.data:
+            raise ValidationError({"detail": "Изменение задолженности запрещено"})
+        return super().update(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -52,25 +59,6 @@ class NetworkNodeViewSet(viewsets.ModelViewSet):
             "node_id": node.id
         })
 
-    # @action(detail=True, methods=['post'])
-    # def send_contacts(self, request, pk=None):
-    #     """
-    #     Отправляет контактные данные объекта на email пользователя
-    #     POST /api/network-nodes/1/send_contacts/
-    #     {
-    #         "email": "optional@example.com"  # Опционально
-    #     }
-    #     """
-    #     node = self.get_object()
-    #     recipient_email = request.data.get('email', request.user.email)
-    #
-    #     send_network_contact_email.delay(node.id, recipient_email)
-    #
-    #     return Response({
-    #         "status": "success",
-    #         "message": f"Контактные данные будут отправлены на {recipient_email}",
-    #         "node_id": node.id
-    #     })
 
 
 

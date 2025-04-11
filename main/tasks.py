@@ -49,22 +49,10 @@ def decrease_debt_randomly():
 
 @shared_task
 def async_clear_debt(node_ids):
-    """
-    Асинхронная очистка задолженности для списка объектов
-    Используется при массовой очистке (>20 объектов)
-    """
-    nodes = NetworkNode.objects.filter(id__in=node_ids)
-    cleared_count = nodes.count()
-
     with transaction.atomic():
-        nodes.update(debt=0)
+        NetworkNode.objects.filter(id__in=node_ids).update(debt=0)
+    return f"Cleared debt for {len(node_ids)} nodes"
 
-
-    return f"Cleared debt for {cleared_count} nodes"
-
-
-from django.core.mail import EmailMultiAlternatives
-from django.template.loader import render_to_string
 
 from celery import shared_task
 from django.core.mail import EmailMultiAlternatives
@@ -145,36 +133,3 @@ def send_network_contact_email(node_id, recipient_email):
     email.send()
     return f"Письмо с QR-кодом отправлено на {recipient_email}"
 
-# @shared_task
-# def send_network_contact_email(node_id, recipient_email):
-#     from .models import NetworkNode
-#     from .serializers import NetworkNodeContactSerializer
-#
-#     node = NetworkNode.objects.get(id=node_id)
-#     serializer = NetworkNodeContactSerializer(node)
-#     node_data = serializer.data
-#
-#     subject = f"Контактные данные: {node_data['name']}"
-#
-#     # Рендер HTML и текстовой версии
-#     html_content = render_to_string('emails/network_contact_email.html', {
-#         'node': node_data
-#     })
-#     text_content = f"""Контактные данные {node_data['name']}
-# Тип: {node.get_node_type_display()}
-# Email: {node_data['email']}
-# Адрес: {node_data['country']}, {node_data['city']}, {node_data['street']}, {node_data['house_number']}
-# """
-#     if node_data.get('phone'):
-#         text_content += f"Телефон: {node_data['phone']}\n"
-#
-#     email = EmailMultiAlternatives(
-#         subject,
-#         text_content,
-#         'fxckaccerman@gmail.com',  # Используется DEFAULT_FROM_EMAIL
-#         [recipient_email]
-#     )
-#     email.attach_alternative(html_content, "text/html")
-#     email.send()
-#
-#     return f"Письмо отправлено на {recipient_email}"

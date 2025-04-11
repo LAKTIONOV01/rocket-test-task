@@ -3,13 +3,13 @@
     "model": "main.networknode",
     "pk": 1,
     "fields": {
-      "name": "Электронный завод 'Микрочип'",
+      "name": "Автомобильный завод 'Волга'",
       "node_type": "factory",
-      "email": "factory@microchip.ru",
+      "email": "volga@auto.ru",
       "country": "Россия",
-      "city": "Москва",
-      "street": "Промышленная",
-      "house_number": "10",
+      "city": "Тольятти",
+      "street": "Южное шоссе",
+      "house_number": "36",
       "supplier": null,
       "debt": "0.00",
       "created_at": "2023-01-01T00:00:00Z",
@@ -20,16 +20,16 @@
     "model": "main.networknode",
     "pk": 2,
     "fields": {
-      "name": "Центральный дистрибьютор",
+      "name": "Центральный дистрибьютор автотехники",
       "node_type": "distributor",
-      "email": "distributor@electronics.ru",
+      "email": "auto_dist@mail.ru",
       "country": "Россия",
-      "city": "Санкт-Петербург",
-      "street": "Торговая",
-      "house_number": "5",
+      "city": "Москва",
+      "street": "Ленинградский проспект",
+      "house_number": "80",
       "supplier": 1,
-      "debt": "15000.00",
-      "created_at": "2023-01-02T00:00:00Z",
+      "debt": "2500000.00",
+      "created_at": "2023-01-05T00:00:00Z",
       "level": 1
     }
   },
@@ -37,56 +37,340 @@
     "model": "main.networknode",
     "pk": 3,
     "fields": {
-      "name": "Дилерский центр 'ТехноМир'",
+      "name": "Дилерский центр 'Престиж Авто'",
       "node_type": "dealership",
-      "email": "technomir@dealer.ru",
+      "email": "prestige@auto.ru",
       "country": "Россия",
-      "city": "Казань",
-      "street": "Центральная",
+      "city": "Санкт-Петербург",
+      "street": "Выборгское шоссе",
       "house_number": "15",
       "supplier": 2,
-      "debt": "7500.50",
-      "created_at": "2023-01-03T00:00:00Z",
+      "debt": "1800000.00",
+      "created_at": "2023-01-10T00:00:00Z",
       "level": 2
     }
   },
   {
-    "model": "main.product",
-    "pk": 1,
+    "model": "main.networknode",
+    "pk": 4,
     "fields": {
-      "name": "Смартфон",
-      "model": "Galaxy S23",
-      "release_date": "2023-02-01",
-      "network_node": 1
+      "name": "Сеть магазинов 'АвтоМир'",
+      "node_type": "retail",
+      "email": "autoworld@retail.ru",
+      "country": "Россия",
+      "city": "Новосибирск",
+      "street": "Красный проспект",
+      "house_number": "220",
+      "supplier": 2,
+      "debt": "3200000.00",
+      "created_at": "2023-01-15T00:00:00Z",
+      "level": 2
     }
   },
   {
-    "model": "main.product",
-    "pk": 2,
+    "model": "main.networknode",
+    "pk": 5,
     "fields": {
-      "name": "Ноутбук",
-      "model": "UltraBook Pro",
-      "release_date": "2023-03-15",
-      "network_node": 1
+      "name": "ИП Смирнов А.В.",
+      "node_type": "entrepreneur",
+      "email": "smirnov.av@business.ru",
+      "country": "Россия",
+      "city": "Казань",
+      "street": "Пушкина",
+      "house_number": "42",
+      "supplier": 3,
+      "debt": "450000.00",
+      "created_at": "2023-01-20T00:00:00Z",
+      "level": 3
     }
   },
   {
-    "model": "main.product",
-    "pk": 3,
+    "model": "main.networknode",
+    "pk": 6,
     "fields": {
-      "name": "Телевизор",
-      "model": "SmartTV 4K",
-      "release_date": "2023-01-10",
-      "network_node": 2
+      "name": "Завод спецтехники 'Урал'",
+      "node_type": "factory",
+      "email": "ural@tech.ru",
+      "country": "Россия",
+      "city": "Миасс",
+      "street": "Автозаводцев",
+      "house_number": "1",
+      "supplier": null,
+      "debt": "0.00",
+      "created_at": "2023-02-01T00:00:00Z",
+      "level": 0
     }
   },
   {
-    "model": "main.employee",
-    "pk": 1,
+    "model": "main.networknode",
+    "pk": 7,
     "fields": {
-      "user": 1,
-      "network_node": 1,
-      "is_active": true
+      "name": "Дальневосточный дистрибьютор",
+      "node_type": "distributor",
+      "email": "far_east_dist@mail.ru",
+      "country": "Россия",
+      "city": "Владивосток",
+      "street": "Светланская",
+      "house_number": "115",
+      "supplier": 6,
+      "debt": "1800000.00",
+      "created_at": "2023-02-05T00:00:00Z",
+      "level": 1
+    }
+  },
+  {
+    "model": "main.networknode",
+    "pk": 8,
+    "fields": {
+      "name": "Дилер 'ТехноМоторс'",
+      "node_type": "dealership",
+      "email": "technomotors@auto.ru",
+      "country": "Россия",
+      "city": "Хабаровск",
+      "street": "Карла Маркса",
+      "house_number": "65",
+      "supplier": 7,
+      "debt": "950000.00",
+      "created_at": "2023-02-10T00:00:00Z",
+      "level": 2
+    }
+  },
+  {
+    "model": "main.networknode",
+    "pk": 9,
+    "fields": {
+      "name": "ИП Козлов С.И.",
+      "node_type": "entrepreneur",
+      "email": "kozlov.si@mail.ru",
+      "country": "Россия",
+      "city": "Южно-Сахалинск",
+      "street": "Ленина",
+      "house_number": "12",
+      "supplier": 8,
+      "debt": "280000.00",
+      "created_at": "2023-02-15T00:00:00Z",
+      "level": 3
+    }
+  },
+  {
+    "model": "main.networknode",
+    "pk": 10,
+    "fields": {
+      "name": "Сеть 'АвтоСити'",
+      "node_type": "retail",
+      "email": "autocity@retail.ru",
+      "country": "Россия",
+      "city": "Екатеринбург",
+      "street": "Малышева",
+      "house_number": "101",
+      "supplier": 2,
+      "debt": "2100000.00",
+      "created_at": "2023-02-20T00:00:00Z",
+      "level": 2
+    }
+  },
+  {
+    "model": "main.networknode",
+    "pk": 11,
+    "fields": {
+      "name": "Запчасти для всех",
+      "node_type": "retail",
+      "email": "partsforall@retail.ru",
+      "country": "Россия",
+      "city": "Ростов-на-Дону",
+      "street": "Буденновский",
+      "house_number": "60",
+      "supplier": 4,
+      "debt": "750000.00",
+      "created_at": "2023-03-01T00:00:00Z",
+      "level": 3
+    }
+  },
+  {
+    "model": "main.networknode",
+    "pk": 12,
+    "fields": {
+      "name": "ИП Петров В.К.",
+      "node_type": "entrepreneur",
+      "email": "petrov.vk@business.ru",
+      "country": "Россия",
+      "city": "Краснодар",
+      "street": "Северная",
+      "house_number": "33",
+      "supplier": 10,
+      "debt": "320000.00",
+      "created_at": "2023-03-05T00:00:00Z",
+      "level": 4
+    }
+  },
+  {
+    "model": "main.networknode",
+    "pk": 13,
+    "fields": {
+      "name": "Завод 'КамАЗ'",
+      "node_type": "factory",
+      "email": "kamaz@trucks.ru",
+      "country": "Россия",
+      "city": "Набережные Челны",
+      "street": "Автозаводская",
+      "house_number": "2",
+      "supplier": null,
+      "debt": "0.00",
+      "created_at": "2023-03-10T00:00:00Z",
+      "level": 0
+    }
+  },
+  {
+    "model": "main.networknode",
+    "pk": 14,
+    "fields": {
+      "name": "Грузовой дистрибьютор",
+      "node_type": "distributor",
+      "email": "truck_dist@mail.ru",
+      "country": "Россия",
+      "city": "Самара",
+      "street": "Ново-Садовая",
+      "house_number": "106",
+      "supplier": 13,
+      "debt": "3800000.00",
+      "created_at": "2023-03-15T00:00:00Z",
+      "level": 1
+    }
+  },
+  {
+    "model": "main.networknode",
+    "pk": 15,
+    "fields": {
+      "name": "Дилер 'ТракторСервис'",
+      "node_type": "dealership",
+      "email": "tractorservice@mail.ru",
+      "country": "Россия",
+      "city": "Воронеж",
+      "street": "Московский проспект",
+      "house_number": "12Б",
+      "supplier": 14,
+      "debt": "1500000.00",
+      "created_at": "2023-03-20T00:00:00Z",
+      "level": 2
+    }
+  },
+  {
+    "model": "main.networknode",
+    "pk": 16,
+    "fields": {
+      "name": "ИП Сидоров А.М.",
+      "node_type": "entrepreneur",
+      "email": "sidorov.am@business.ru",
+      "country": "Россия",
+      "city": "Липецк",
+      "street": "Зегеля",
+      "house_number": "7",
+      "supplier": 15,
+      "debt": "420000.00",
+      "created_at": "2023-03-25T00:00:00Z",
+      "level": 3
+    }
+  },
+  {
+    "model": "main.networknode",
+    "pk": 17,
+    "fields": {
+      "name": "Сеть 'ГрузовикПлюс'",
+      "node_type": "retail",
+      "email": "truckplus@retail.ru",
+      "country": "Россия",
+      "city": "Челябинск",
+      "street": "Кирова",
+      "house_number": "156",
+      "supplier": 14,
+      "debt": "2100000.00",
+      "created_at": "2023-04-01T00:00:00Z",
+      "level": 2
+    }
+  },
+  {
+    "model": "main.networknode",
+    "pk": 18,
+    "fields": {
+      "name": "ИП Кузнецов Е.П.",
+      "node_type": "entrepreneur",
+      "email": "kuznetsov.ep@mail.ru",
+      "country": "Россия",
+      "city": "Омск",
+      "street": "Масленникова",
+      "house_number": "24",
+      "supplier": 17,
+      "debt": "380000.00",
+      "created_at": "2023-04-05T00:00:00Z",
+      "level": 3
+    }
+  },
+  {
+    "model": "main.networknode",
+    "pk": 19,
+    "fields": {
+      "name": "Запчасти 'Тягач'",
+      "node_type": "retail",
+      "email": "tyagach@parts.ru",
+      "country": "Россия",
+      "city": "Уфа",
+      "street": "Революционная",
+      "house_number": "55",
+      "supplier": 15,
+      "debt": "680000.00",
+      "created_at": "2023-04-10T00:00:00Z",
+      "level": 3
+    }
+  },
+  {
+    "model": "main.networknode",
+    "pk": 20,
+    "fields": {
+      "name": "ИП Власов Д.Н.",
+      "node_type": "entrepreneur",
+      "email": "vlasov.dn@business.ru",
+      "country": "Россия",
+      "city": "Пермь",
+      "street": "Петропавловская",
+      "house_number": "18",
+      "supplier": 19,
+      "debt": "190000.00",
+      "created_at": "2023-04-15T00:00:00Z",
+      "level": 4
+    }
+  },
+  {
+    "model": "main.networknode",
+    "pk": 21,
+    "fields": {
+      "name": "Дилер 'АвтоСпецТехника'",
+      "node_type": "dealership",
+      "email": "autospectech@mail.ru",
+      "country": "Россия",
+      "city": "Красноярск",
+      "street": "Мира",
+      "house_number": "131",
+      "supplier": 7,
+      "debt": "1250000.00",
+      "created_at": "2023-04-20T00:00:00Z",
+      "level": 2
+    }
+  },
+  {
+    "model": "main.networknode",
+    "pk": 22,
+    "fields": {
+      "name": "ИП Морозова Т.С.",
+      "node_type": "entrepreneur",
+      "email": "morozova.ts@mail.ru",
+      "country": "Россия",
+      "city": "Иркутск",
+      "street": "Декабрьских Событий",
+      "house_number": "102",
+      "supplier": 21,
+      "debt": "240000.00",
+      "created_at": "2023-04-25T00:00:00Z",
+      "level": 3
     }
   }
 ]
