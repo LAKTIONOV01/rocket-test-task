@@ -3,6 +3,7 @@
 #### По шагам
 
 ##### docker compose up -d --build
+##### docker exec -it django /bin/bash (после python manage.py loaddata fixtures/initial_data.json) 
 ##### api/ - API ROOT
 ##### api/statistics/debt/ - Статистику об объектах, задолженность которых превышает среднюю задолженность всех объектов;
 ##### /api/auth/users/ - Зарегистрироваться для токена
