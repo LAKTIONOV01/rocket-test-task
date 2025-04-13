@@ -1,7 +1,7 @@
-from rest_framework import viewsets, generics, permissions, filters
+from rest_framework import viewsets, generics, filters
 from django.db.models import Avg
-from .models import NetworkNode, Product, Employee
-from .serializers import NetworkNodeSerializer, ProductSerializer, EmployeeSerializer
+from .models import NetworkNode, Product
+from .serializers import NetworkNodeSerializer, ProductSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -9,15 +9,6 @@ from .tasks import send_network_contact_email
 from rest_framework.exceptions import ValidationError
 from .permissions import IsAdminOrActiveEmployee
 from rest_framework import status
-
-
-class IsActiveEmployee(permissions.BasePermission):
-    def has_permission(self, request, view):
-        if request.user.is_authenticated:
-            return Employee.objects.filter(user=request.user, is_active=True).exists()
-        return False
-
-
 from .filters import NetworkNodeFilter
 from .serializers import NetworkNodeForProductFilterSerializer
 
@@ -27,34 +18,38 @@ class NetworkNodeViewSet(viewsets.ModelViewSet):
     serializer_class = NetworkNodeSerializer
     permission_classes = [IsAdminOrActiveEmployee]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['country', 'products']
-    search_fields = ['name', 'city']
-
     filterset_class = NetworkNodeFilter
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        # Фильтрация по продукту (если есть в запросе)
+        if 'product' in self.request.query_params:
+            queryset = queryset.prefetch_related('products', 'supplier')
+
+        product_id = self.request.query_params.get('product')
+        if product_id:
+            queryset = queryset.filter(products__id=product_id).distinct()
+
+        # Для обычных сотрудников - только их NetworkNode
+        if not (self.request.user.is_staff or self.request.user.is_superuser):
+            try:
+                queryset = queryset.filter(id=self.request.user.employee.network_node.id)
+            except AttributeError:
+                queryset = queryset.none()  # Нет доступа, если нет employee
+
+        return queryset
 
     def get_serializer_class(self):
         if 'product' in self.request.query_params:
             return NetworkNodeForProductFilterSerializer
         return super().get_serializer_class()
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        if 'product' in self.request.query_params:
-            queryset = queryset.prefetch_related('products', 'supplier')
-        return queryset
-
     def update(self, request, *args, **kwargs):
         # Явная проверка на попытку изменить debt
         if 'debt' in request.data:
             raise ValidationError({"detail": "Изменение задолженности запрещено"})
         return super().update(request, *args, **kwargs)
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        product_id = self.request.query_params.get('product')
-        if product_id:
-            return queryset.filter(products__id=product_id).distinct()
-        return queryset
 
     def perform_create(self, serializer):
         instance = serializer.save()

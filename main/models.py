@@ -1,9 +1,23 @@
 from django.db import models
-from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from datetime import datetime
+
+
+
+from django.contrib.auth.models import AbstractUser, User
+from django.db import models
+
+# class User(AbstractUser):
+#     network_node = models.OneToOneField(
+#         'NetworkNode',
+#         on_delete=models.SET_NULL,
+#         null=True,
+#         blank=True,
+#         related_name='user_account'
+#     )
+
 
 
 class NetworkNode(models.Model):
@@ -57,13 +71,6 @@ class Product(models.Model):
     primary_network_node = models.ForeignKey(NetworkNode, on_delete=models.SET_NULL, null=True,
                                              blank=True,
                                              related_name='primary_products', verbose_name='Звено сети')
-
-    def clean(self):
-        if len(self.name) > 25:
-            raise ValidationError({'name': 'Название продукта не может быть длиннее 25 символов'})
-        if self.release_date > datetime.now().date():
-            raise ValidationError({'release_date': 'Дата выхода не может быть в будущем'})
-
     class Meta:
         verbose_name = 'Продукт'
         verbose_name_plural = 'Продукты'

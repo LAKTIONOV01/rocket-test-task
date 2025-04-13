@@ -6,9 +6,13 @@ from datetime import datetime
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    primary_network_node_name = serializers.CharField(
+        source='primary_network_node.name',
+        read_only=True
+    )
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = ['id', 'name', 'model', 'release_date', 'primary_network_node_name']
         read_only_fields = ('id',)
 
     def validate_name(self, value):
